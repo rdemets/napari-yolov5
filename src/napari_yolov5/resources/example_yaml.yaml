@@ -1,0 +1,8 @@
+######## Data information
+
+train: G:/Data/Training/images/train
+val: G:/Data/Training/images/valid
+nc: 2    #Number of classes
+names: [Mit, Apo] #Name of classes, separated with ,
+
+
