@@ -9,9 +9,9 @@
 
 Plugin adapted from Ultralytics to bring YOLOv5 into Napari. 
 
-Training and detection can be done using the GUI. Training dataset must be prepared prior using this plugin. Further development will allow users to use Napari to prepare the dataset. Follow instructions stated on [Ultralytics Github](https://github.com/ultralytics/yolov5) to prepare the dataset.
+Training and detection can be done using the GUI. Training dataset must be prepared prior to using this plugin. Further development will allow users to use Napari to prepare the dataset. Follow instructions stated on [Ultralytics Github](https://github.com/ultralytics/yolov5) to prepare the dataset.
 
-The plugin includes 3 pre-trained networks able to identify mitosis stages or apoptosis on soSPIM images. More details can be found on the [pre-print](https://www.biorxiv.org/content/10.1101/2021.03.26.437121v1.full)
+The plugin includes 3 pre-trained networks that are able to identify mitosis stages or apoptosis on soSPIM images. More details can be found on the [pre-print](https://www.biorxiv.org/content/10.1101/2021.03.26.437121v1.full).
 
 ----------------------------------
 
@@ -45,41 +45,51 @@ pip install torchvision==0.10.0+cu111 -f https://download.pytorch.org/whl/torch_
 
 ## Usage
 
-First select if you would like to train a new network or use a pre-trained network.
+First select if you would like to train a new network or detect objects.
+
 ![alt text](https://github.com/rdemets/napari-yolov5/blob/main/src/napari_yolov5/resources/Readme/1.jpg?raw=true)
 
 
-For training :
-An example of the YAML config file is provided in src/napari_yolov5/resources folder
-![alt text](https://github.com/rdemets/napari-yolov5/blob/main/src/napari_yolov5/resources/Readme/3.jpg?raw=true)
+***For `Training` :***
 
 Data preparation should be done following [Ultralytics'](https://github.com/ultralytics/yolov5) instructions.
 
-Select the size of the network, the number of epochs, the number of images per batch to load on the GPU, the size of the images (must be a stride of 32), and the name of the network
+Select the size of the network, the number of epochs, the number of images per batch to load on the GPU, the size of the images (must be a stride of 32), and the name of the network.
+
 ![alt text](https://github.com/rdemets/napari-yolov5/blob/main/src/napari_yolov5/resources/Readme/2.jpg?raw=true)
 
-Progress can be seen on the Terminal, and Napari will switch to Detection mode automatically when the network is being trained
+An example of the YAML config file is provided in `src/napari_yolov5/resources` folder.
+
+![alt text](https://github.com/rdemets/napari-yolov5/blob/main/src/napari_yolov5/resources/Readme/3.jpg?raw=true)
+
+
+Progress can be seen on the Terminal. The viewer will switch to `Detection` mode automatically when the network is finished being trained.
+
 ![alt text](https://github.com/rdemets/napari-yolov5/blob/main/src/napari_yolov5/resources/Readme/4.jpg?raw=true)
 
 
-For detection :
-It is possible to perform the detection on a single layer to be chosen in the list, all the layers being open, or by giving a folder path. For folder detection, all the images will be loaded as a single stack
+***For `Detection` :***
+
+It is possible to perform the detection on a single layer chosen in the list, all the layers opened, or by giving a folder path. For folder detection, all the images will be loaded as a single stack.
+
 ![alt text](https://github.com/rdemets/napari-yolov5/blob/main/src/napari_yolov5/resources/Readme/5.jpg?raw=true)
 
-Nucleus size of the prediction layer has te be filled to resize the image to the training dataset. Training nucleus size will be asked in case of custom network.
+Nucleus size of the prediction layer has te be filled to resize the image to the training dataset. Nucleus size of the training dataset will be asked in case of a custom network.
 
-Confidence threshold defines the minimum value for an detected object to be considered positive. 
-iou nms threshold (intersection-over-union non-max-suppression) defines the overlapping area that considers that two overlapping boxes are a single object. Only the maximum confidence is then kept.
-Progress can be seen on the Terminal
+Confidence threshold defines the minimum value for a detected object to be considered positive. 
+iou nms threshold (intersection-over-union non-max-suppression) defines the overlapping area of two boxes as a single object. Only the box with the maximum confidence is kept.
+Progress can be seen on the Terminal.
+
 ![alt text](https://github.com/rdemets/napari-yolov5/blob/main/src/napari_yolov5/resources/Readme/6.jpg?raw=true)
 
-Few options allow to modify how the boxes are being displayed (box+class name, box only) and if the localisation and overlay will be exported.
-Post-processing option will perform a simple 3D assignment based on 3D connected component analysis. A median filter (1x1x3 XYZ) is applied prior the assignment. 
-The centroid of each objects is then saved into a new point layer as a 3D points with a random color for each class. 
+Few options allow for modification on how the boxes are being displayed (default : box + class + confidence score ; box + class ; box only) and if the box coordinates and the image overlay will be exported.
+Post-processing option will perform a simple 3D assignment based on 3D connected component analysis. A median filter (1x1x3 XYZ) is applied prior to the assignment. 
+The centroid of each object is then saved into a new point layer as a 3D point with a random color for each class. 
+
 ![alt text](https://github.com/rdemets/napari-yolov5/blob/main/src/napari_yolov5/resources/Readme/7.jpg?raw=true)
 
-The localisation of each centroid is then saved. 
-The path is being shown in the Terminal at the end of the detection.
+The localisation of each centroid is saved and the path is shown in the Terminal at the end of the detection.
+
 ![alt text](https://github.com/rdemets/napari-yolov5/blob/main/src/napari_yolov5/resources/Readme/8.jpg?raw=true)
 
 

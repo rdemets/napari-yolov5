@@ -1,8 +1,5 @@
 
-   
-"""
-cellpose dock widget module
-"""
+
 from typing import Any
 from napari_plugin_engine import napari_hook_implementation
 
@@ -43,7 +40,6 @@ from enum import Enum
 
 import torch
 
-#logger, log_file = logger_setup()
 
 def abspath(root, relpath):
     from pathlib import Path
@@ -60,14 +56,13 @@ def abspath(root, relpath):
 #print(__file__)
 logo = abspath(__file__, 'resources/SIMBA.png')
 
-#logo = 'G:\mbirdm\\Napari\\napari-yolo-test_v2.0\\napari_yolo_test\\resources\SIMBA.png'
-#print(logo)
+
 
 
 def widget_wrapper():
 
     @magicgui(
-        label_head=dict(widget_type='Label', label='<h1><img src="{logo}">SiMBA - NUS</h1>'),
+        label_head=dict(widget_type='Label', label=f'<center><img src="{logo}"><h2>SiMBA - NUS</h2></center>'),
         layout='vertical',
         main_task=dict(widget_type='RadioButtons', label='What do you want to do today ?', orientation='horizontal',
                        choices=['Training', 'Detection']),
@@ -210,7 +205,6 @@ def widget_wrapper():
 
             elif image_type == 'Folder':
                 First_image = True
-                # widget.folder_detect.value = 'G:/mbirdm/Data/Selwin/Training/images/valid/'
                 for file in os.listdir(folder_detect):
                     if file.endswith(".tif"):
                         path = os.path.join(folder_detect, file)
@@ -362,7 +356,7 @@ def widget_wrapper():
 
 
 
-    widget.label_head.value = '<small>YOLOv5 detection using Napari.<br>This plugin has been made thanks to the hard work of Ultralytics</small><br><br><tt><a href="https://github.com/ultralytics/yolov5" style="color:gray;">https://github.com/ultralytics/yolov5</a></tt>'
+    widget.label_head.value = '<center>This plugin aims to bring YOLOv5 <br>developed by Ultralytics into Napari viewer</center><br><tt><a href="https://github.com/ultralytics/yolov5" style="color:gray;">https://github.com/ultralytics/yolov5</a></tt>'
 
 
 
