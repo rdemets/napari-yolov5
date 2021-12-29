@@ -32,7 +32,7 @@ First install conda and create an environment for the plugin
 conda create --prefix env-napari-yolov5 python=3.9
 conda activate env-napari-yolov5
 ```
-You can install `napari-yolov5` and `napari` via [pip]: (IN PROGRESS)
+You can install `napari-yolov5` and `napari` via [pip]:
 
     pip install napari-yolov5 
     pip install napari[all]
