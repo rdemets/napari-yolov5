@@ -32,9 +32,9 @@ First install conda and create an environment for the plugin
 conda create --prefix env-napari-yolov5 python=3.9
 conda activate env-napari-yolov5
 ```
-You can install `napari-yolov5` and `napari` via [pip]:
+You can install `napari-yolov5` and `napari` via [pip]: (IN PROGRESS)
 
-    pip install napari-yolov5
+    pip install napari-yolov5 
     pip install napari[all]
 
 For GPU support :
