@@ -111,6 +111,10 @@ def widget_wrapper():
                         label='<h3><center><b>Post Processing:</b></center><br></h3>'),
         assignment_3d=dict(widget_type='CheckBox', visible=False, text='3D Assignment (Connected Component Analysis)', value=True,
                        tooltip='Replace boxes by centroid point'),
+        change_save_dir=dict(widget_type='RadioButtons', visible=False, label='Choose export directory', orientation='horizontal',
+                        choices=['Automatic','Manuel'],value = 'Automatic', tooltip='Folder to export detection'),
+        folder_to_save=dict(widget_type='LineEdit', label='Export folder: ', visible=False,
+                           tooltip='Folder for prediction to be saved'),
         # title_output = dict(widget_type='Label', visible=False, label='<h3><center><b>Outputs:</b></center><br></h3>'),
         save_txt=dict(widget_type='CheckBox', visible=False, text='Export detection as txt', value=True,
                       tooltip='save raw coordinates as txt'),
@@ -137,7 +141,6 @@ def widget_wrapper():
                model_type,
                custom_model,
                training_nucleus_size,
-               save_detect,
                conf_threshold,
                iou_nms_threshold,
                hide_conf,
@@ -147,6 +150,9 @@ def widget_wrapper():
                box_line_thickness,
                title_post,
                assignment_3d,
+               change_save_dir,
+               save_detect,
+               folder_to_save,
                # title_output,
                #run_detection_button,
                # save_button,
@@ -155,13 +161,9 @@ def widget_wrapper():
         if main_task == 'Training':
             from ._function import run_training
             JustOneTime = False
-            save_dir = ''
             path_yaml = training_path
-            save_dir = run_training(path_yaml, widget)
-            widget.main_task.value = 'Detection'
-            widget.model_type.value = 'custom'
-            widget.custom_model.value = abspath(save_dir, 'weights/best.pt')
-            print('\n\n############# Training End #############\n\n')
+            run_training(path_yaml, widget, viewer)
+
 
         elif main_task == 'Detection':
             from ._function import run_detect
@@ -261,6 +263,17 @@ def widget_wrapper():
                     else:
                         print('No object was found')
             print('\n\n############# Detection End #############\n\n')
+            
+    @widget.change_save_dir.changed.connect
+    def _change_savedir_display(e:Any):
+        if widget.change_save_dir.value == 'Manuel':
+            if widget.folder_to_save.value:
+                pass
+            else:
+                widget.folder_to_save.value = qtpy.QtWidgets.QFileDialog.getExistingDirectory(None, 'Select Folder')
+                widget.folder_to_save.visible = True
+        elif widget.change_save_dir.value == 'Automatic':
+            widget.folder_to_save.visible = False
 
     @widget.main_task.changed.connect
     def _change_main_display(e: Any):
@@ -287,6 +300,8 @@ def widget_wrapper():
             widget.box_line_thickness.visible = False
             widget.title_post.visible = False
             widget.assignment_3d.visible = False
+            widget.change_save_dir.visible = False
+            widget.folder_to_save.visible = False
             #widget.run_detection_button.visible = False
             # widget.title_output.visible = False
             widget.save_txt.visible = False
@@ -314,6 +329,8 @@ def widget_wrapper():
             widget.box_line_thickness.visible = True
             widget.title_post.visible = True
             widget.assignment_3d.visible = True
+            widget.change_save_dir.visible = True
+            widget.folder_to_save.visible = False          
             #widget.run_detection_button.visible = True
             # widget.title_output.visible = True
             widget.save_txt.visible = True
