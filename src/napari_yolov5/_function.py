@@ -71,12 +71,41 @@ import scipy
 import cc3d
 from skimage import measure
 
+import matplotlib
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvas
+from qtpy.QtWidgets import QDialog, QWidget, QVBoxLayout
+from napari.qt.threading import thread_worker
+
 LOGGER = logging.getLogger(__name__)
 LOCAL_RANK = int(os.getenv('LOCAL_RANK', -1))  # https://pytorch.org/docs/stable/elastic/run.html
 RANK = int(os.getenv('RANK', -1))
 WORLD_SIZE = int(os.getenv('WORLD_SIZE', 1))
 
+#  Source : https://github.com/jni/napariboard-proto/blob/master/napariboard.py
+with plt.style.context('dark_background'):
+    progress_canvas = FigureCanvas(Figure())
+    progress_axes = progress_canvas.figure.subplots()
+    lines = progress_axes.plot([],[])
+    progress_axes.set_xlim(0,10)
+    progress_axes.set_xlabel('Epochs')
+    progress_axes.set_ylabel('Fitness Score')
+    progress_canvas.figure.tight_layout()
+    progress_line = lines[0]
 
+def update_chart(mAP):
+    x,y = progress_line.get_data()
+    new_y = np.append(y,mAP)
+    new_x = np.arange(len(new_y))
+    progress_line.set_data(new_x,new_y)
+    progress_axes.set_ylim(0,np.max(new_y)*1.05)
+    x_max = len(new_x) // 10
+    progress_axes.set_xlim(0, (x_max+1)*10)
+    progress_canvas.draw_idle()
+
+
+@thread_worker(connect={'yielded':update_chart})
 def train(hyp,  # path/to/hyp.yaml or hyp dictionary
           opt,
           device,
@@ -389,6 +418,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
 
             # Update best mAP
             fi = fitness(np.array(results).reshape(1, -1))  # weighted combination of [P, R, mAP@.5, mAP@.5-.95]
+            yield fi # yield value to update the chart
             if fi > best_fitness:
                 best_fitness = fi
             log_vals = list(mloss) + list(results) + lr
@@ -456,6 +486,7 @@ def train(hyp,  # path/to/hyp.yaml or hyp dictionary
         LOGGER.info(f"Results saved to {colorstr('bold', save_dir)}")
 
     torch.cuda.empty_cache()
+    print('\n\n############# Training End #############\n\n')
     return results
 
 def parse_opt_train(known,path_yaml,widget):
@@ -506,7 +537,7 @@ def parse_opt_train(known,path_yaml,widget):
     opt = parser.parse_known_args()[0] if known else parser.parse_args()
     return opt
 
-def main(opt, callbacks=Callbacks()):
+def main(opt, viewer, callbacks=Callbacks()):
     # Checks
     set_logging(RANK)
     if RANK in [-1, 0]:
@@ -544,7 +575,8 @@ def main(opt, callbacks=Callbacks()):
 
     # Train
     if not opt.evolve:
-        train(opt.hyp, opt, device, callbacks)
+        viewer.window.add_dock_widget(progress_canvas, name = "Progress Chart")
+        worker = train(opt.hyp, opt, device, viewer, callbacks)
         if WORLD_SIZE > 1 and RANK == 0:
             LOGGER.info('Destroying process group... ')
             dist.destroy_process_group()
@@ -640,11 +672,10 @@ def main(opt, callbacks=Callbacks()):
 # This is the actual plugin function, where we export our function
 # (The functions themselves are defined below)
 @napari_hook_implementation
-def run_training(path_yaml,widget):
+def run_training(path_yaml,widget,viewer):
     # Usage: import train; train.run(data='coco128.yaml', imgsz=320, weights='yolov5m.pt')
     opt = parse_opt_train(False,path_yaml,widget)
-    save_dir = main(opt)
-    return save_dir
+    main(opt,viewer)
 
 
 
@@ -681,7 +712,6 @@ def parse_opt_detect(widget,data,name):
     parser.add_argument('--augment', action='store_true', help='augmented inference')
     parser.add_argument('--visualize', action='store_true', help='visualize features')
     parser.add_argument('--update', action='store_true', help='update all models')
-    parser.add_argument('--project', default=ROOT / 'runs/detect', help='save results to project/name')
     parser.add_argument('--name', default=widget.save_detect.value, help='save results to project/name')
     parser.add_argument('--exist-ok', action='store_true', help='existing project/name ok, do not increment')
     parser.add_argument('--line-thickness', default=widget.box_line_thickness.value, type=int, help='bounding box thickness (pixels)')
@@ -690,6 +720,11 @@ def parse_opt_detect(widget,data,name):
     parser.add_argument('--assignment_3d', default=widget.assignment_3d.value, action='store_true', help='hide confidences')
     parser.add_argument('--half', action='store_true', help='use FP16 half-precision inference')
     parser.add_argument('--dnn', action='store_true', help='use OpenCV DNN for ONNX inference')
+    
+    if widget.change_save_dir.value == 'Manuel':
+        parser.add_argument('--project', default=widget.folder_to_save.value, help='save results to project/name')
+    else:
+        parser.add_argument('--project', default=ROOT / 'runs/detect', help='save results to project/name')    
     opt = parser.parse_args()
     #print(opt)
     return opt
