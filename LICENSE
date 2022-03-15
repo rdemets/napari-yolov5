@@ -1,7 +1,16 @@
 
+This project was adapted from ultralytics/yolov5 release 6.0;
+The model architectures are the same, but packaged as a proper installable
+python module with entry-points for Napari. Training progress, detection inputs
+and outputs have been adapted to the Napari environment. Networks and parameters 
+remain unchanged and are expected to behave the same way as the original code.
+
+
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
+
+ 
  Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
