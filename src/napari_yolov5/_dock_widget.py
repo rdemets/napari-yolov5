@@ -18,7 +18,7 @@ from napari.layers import Image, Shapes
 from napari_plugin_engine import napari_hook_implementation
 from magicgui import magicgui
 from magicgui import widgets as mw
-from magicgui.events import Event
+#from magicgui.events import Event
 from magicgui.application import use_app
 
 import functools
