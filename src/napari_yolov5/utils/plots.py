@@ -301,9 +301,9 @@ def plot_labels(labels, names=(), save_dir=Path('')):
     x = pd.DataFrame(b.transpose(), columns=['x', 'y', 'width', 'height'])
 
     # seaborn correlogram
-    sn.pairplot(x, corner=True, diag_kind='auto', kind='hist', diag_kws=dict(bins=50), plot_kws=dict(pmax=0.9))
-    plt.savefig(save_dir / 'labels_correlogram.jpg', dpi=200)
-    plt.close()
+    #sn.pairplot(x, corner=True, diag_kind='auto', kind='hist', diag_kws=dict(bins=50), plot_kws=dict(pmax=0.9))
+    #plt.savefig(save_dir / 'labels_correlogram.jpg', dpi=200)
+    #plt.close()
 
     # matplotlib labels
     matplotlib.use('svg')  # faster
