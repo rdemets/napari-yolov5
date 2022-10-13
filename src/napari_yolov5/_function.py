@@ -109,6 +109,7 @@ def update_chart(mAP):
 def train(hyp,  # path/to/hyp.yaml or hyp dictionary
           opt,
           device,
+          viewer,
           callbacks
           ):
     save_dir, epochs, batch_size, weights, single_cls, evolve, data, cfg, resume, noval, nosave, workers, freeze, = \
